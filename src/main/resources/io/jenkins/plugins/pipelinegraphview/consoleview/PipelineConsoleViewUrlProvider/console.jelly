@@ -1,0 +1,9 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout">
+    <l:card title="${%Pipeline}" expandable="pipeline-console">
+        <div class="pgw-graph-container">
+            <div id="graph"/>
+        </div>
+        <script src="${rootURL}/plugin/pipeline-graph-view/js/bundles/pipeline-graph-view-bundle.js"/>
+    </l:card>
+</j:jelly>
