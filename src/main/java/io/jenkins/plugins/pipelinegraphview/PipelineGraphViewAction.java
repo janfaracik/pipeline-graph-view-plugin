@@ -44,8 +44,4 @@ public class PipelineGraphViewAction extends AbstractPipelineViewAction {
 
         return new RunDetailsCard(runDetailsItems);
     }
-
-    public boolean isShowGraphOnBuildPage() {
-        return PipelineGraphViewConfiguration.get().isShowGraphOnBuildPage();
-    }
 }
