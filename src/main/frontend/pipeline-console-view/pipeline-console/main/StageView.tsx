@@ -1,11 +1,4 @@
 import React from "react";
-import Typography from "@mui/material/Typography";
-
-import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
-import ScheduleIcon from "@mui/icons-material/Schedule";
-import TimerIcon from "@mui/icons-material/Timer";
-import InfoIcon from "@mui/icons-material/Info";
-import LinkIcon from "@mui/icons-material/Link";
 
 import {
   StepInfo,
@@ -14,6 +7,13 @@ import {
   LOG_FETCH_SIZE,
 } from "./PipelineConsoleModel";
 import { ConsoleLogCard } from "./ConsoleLogCard";
+import {
+  HourglassOutline,
+  InformationCircleOutline,
+  LinkOutline,
+  TimeOutline,
+  TimerOutline
+} from "react-ionicons";
 
 export interface StageSummaryProps {
   stage: StageInfo;
@@ -31,53 +31,41 @@ const StageSummary = (props: StageSummaryProps) => (
       key={`stage-detail-root-${props.stage.id}`}
     >
       <div className={'pgv-details-card'}>
-        <div
+        <p
           className="pgv-details__item"
           key={`stage-detail-start-time-container-${props.stage.id}`}
         >
           {props.stage.startTimeMillis && (
-            <ScheduleIcon
-              className="detail-icon"
-              key={`stage-detail-start-time-icon-${props.stage.id}`}
-            />
+            <TimeOutline />
           )}
           {props.stage.startTimeMillis}
-        </div>
-        <div
+        </p>
+        <p
           className="pgv-details__item"
           key={`stage-detail-pause-duration-container-${props.stage.id}`}
         >
-          <HourglassEmptyIcon
-            className="detail-icon"
-            key={`stage-detail-pause-duration-icon-${props.stage.id}`}
-          />
+          <HourglassOutline />
           {props.stage.pauseDurationMillis}
-        </div>
-        <div
+        </p>
+        <p
           className="pgv-details__item"
           key={`stage-detail-duration-container-${props.stage.id}`}
         >
-          <TimerIcon
-            className="detail-icon"
-            key={`stage-detail-duration-icon-${props.stage.id}`}
-          />
+          <TimerOutline />
           {props.stage.totalDurationMillis}
-        </div>
-        <div
+        </p>
+        <p
           className="pgv-details__item"
           key={`stage-detail-status-container-${props.stage.id}`}
         >
-          <InfoIcon
-            className="detail-icon"
-            key={`stage-detail-status-icon-${props.stage.id}`}
-          />
+          <InformationCircleOutline />
           <span
             className="capitalize"
             key={`stage-detail-status-text-${props.stage.id}`}
           >
             {props.stage.state}
           </span>
-        </div>
+        </p>
         {props.failedSteps.map((value: StepInfo) => {
           console.debug(`Found failed step ${value}`);
           return (
@@ -87,12 +75,12 @@ const StageSummary = (props: StageSummaryProps) => (
             />
           );
         })}
-        <div className="pgv-details__item">
-          <LinkIcon className="detail-icon" />
-          <a className="pgv-details__item" href={`log?nodeId=${props.stage.id}`}>
+        <p className="pgv-details__item">
+          <LinkOutline />
+          <a href={`log?nodeId=${props.stage.id}`}>
             View as plain text
           </a>
-        </div>
+        </p>
       </div>
     </div>
   </React.Fragment>
@@ -104,8 +92,8 @@ export interface FailedStepLinkProps {
 
 const FailedStepLink = (props: FailedStepLinkProps) => (
   <div className="pgv-details__item">
-    <LinkIcon className="detail-icon" />
-    <a className="pgv-details__item" href={`?selected-node=${props.step.id}`}>
+    <LinkOutline />
+    <a href={`?selected-node=${props.step.id}`}>
       Failed step: {props.step.name}
     </a>
   </div>

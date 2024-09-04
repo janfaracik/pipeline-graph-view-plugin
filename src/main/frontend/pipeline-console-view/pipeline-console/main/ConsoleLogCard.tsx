@@ -12,8 +12,6 @@ import {
 } from "@mui/material";
 import CardActionArea from "@mui/material/CardActions";
 import IconButton, { IconButtonProps } from "@mui/material/IconButton";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import LinkIcon from "@mui/icons-material/Link";
 import { Tooltip } from "react-tippy";
 
 import {
@@ -25,6 +23,7 @@ import ConsoleLogModal from "./ConsoleLogModal";
 import ResizeIcon from "./ResizeIcon";
 
 import { getStepStatus } from "../../../step-status/StepStatus";
+import { ChevronDownOutline, LinkOutline } from "react-ionicons";
 
 const ConsoleLogStream = lazy(() => import("./ConsoleLogStream"));
 
@@ -250,7 +249,7 @@ export class ConsoleLogCard extends React.Component<
                   }
                   aria-label="View step as plain text"
                 >
-                  <LinkIcon className="svg-icon--expand" />
+                  <LinkOutline cssClasses="svg-icon--expand" />
                 </IconButton>
               </Tooltip>
             </Grid>
@@ -263,9 +262,9 @@ export class ConsoleLogCard extends React.Component<
                   key={`step-expand-button-${this.props.step.id}`}
                   sx={{ display: "block", marginLeft: "auto" }}
                 >
-                  <ExpandMoreIcon
+                  <ChevronDownOutline
                     key={`step-expand-icon-${this.props.step.id}`}
-                    className="svg-icon svg-icon--expand"
+                    cssClasses="svg-icon svg-icon--expand"
                   />
                 </ExpandMore>
               </Tooltip>

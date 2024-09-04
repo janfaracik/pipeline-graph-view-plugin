@@ -1,10 +1,9 @@
 import React from "react";
 import TreeView from "@mui/lab/TreeView/";
 import TreeItem from "@mui/lab/TreeItem";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { StageInfo } from "../../../pipeline-graph-view/pipeline-graph/main/";
 import StepStatus from "../../../step-status/StepStatus";
+import { ChevronDownOutline, ChevronForwardOutline } from "react-ionicons";
 
 const getTreeItemsFromStage = (
   stageItems: StageInfo[],
@@ -79,8 +78,8 @@ export default class DataTreeView extends React.Component {
   render() {
     return (
       <TreeView
-        defaultCollapseIcon={<ExpandMoreIcon />}
-        defaultExpandIcon={<ChevronRightIcon />}
+        defaultCollapseIcon={<ChevronDownOutline />}
+        defaultExpandIcon={<ChevronForwardOutline />}
         expanded={this.props.expanded}
         selected={this.props.selected}
         onNodeToggle={this.props.onNodeToggle}
