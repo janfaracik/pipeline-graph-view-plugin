@@ -38,7 +38,6 @@
 }
 
 .App {
-  font-family: sans-serif;
   text-align: center;
   height: 80%;
   display: flex;
@@ -177,6 +176,37 @@ g.build-status-icon__outer {
   --active-card-background: var(--light-yellow);
 }
 
+.pgv-details-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pgv-details__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+
+  span {
+    display: contents;
+  }
+
+  svg {
+    color: currentColor !important;
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  &--link {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
 [data-theme="dark"] {
   --active-card-background: var(--dark-yellow);
 }
@@ -304,15 +334,15 @@ div.step-detail-group-expanded {
   border-bottom-right-radius: 0px;
 }
 
-div.detail-element {
-  display: flex;
-  width: 100%;
-  font-size: var(--font-size-monospace);
-  vertical-align: middle;
-  margin-left: 10px;
-  line-height: 1.66 !important;
-  padding: 3px;
-}
+//div.detail-element {
+//  display: flex;
+//  width: 100%;
+//  font-size: var(--font-size-monospace);
+//  vertical-align: middle;
+//  margin-left: 10px;
+//  line-height: 1.66 !important;
+//  padding: 3px;
+//}
 
 .step-header {
   @extend div, .step-detail-group;

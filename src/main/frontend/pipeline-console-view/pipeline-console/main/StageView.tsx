@@ -23,78 +23,76 @@ export interface StageSummaryProps {
 // Tree Item for stages
 const StageSummary = (props: StageSummaryProps) => (
   <React.Fragment>
+    <div className={'jenkins-card__title'}>
+      Stage '{props.stage.name}'
+    </div>
     <div
-      className="stage-detail-group"
+      className="jenkins-card__content"
       key={`stage-detail-root-${props.stage.id}`}
     >
-      <Typography
-        color="inherit"
-        className="detail-element-header"
-        key={`stage-detail-name-text-${props.stage.id}`}
-      >
-        Stage '{props.stage.name}'
-      </Typography>
-      <div
-        className="detail-element"
-        key={`stage-detail-start-time-container-${props.stage.id}`}
-      >
-        {props.stage.startTimeMillis && (
-          <ScheduleIcon
-            className="detail-icon"
-            key={`stage-detail-start-time-icon-${props.stage.id}`}
-          />
-        )}
-        {props.stage.startTimeMillis}
-      </div>
-      <div
-        className="detail-element"
-        key={`stage-detail-pause-duration-container-${props.stage.id}`}
-      >
-        <HourglassEmptyIcon
-          className="detail-icon"
-          key={`stage-detail-pause-duration-icon-${props.stage.id}`}
-        />
-        {props.stage.pauseDurationMillis}
-      </div>
-      <div
-        className="detail-element"
-        key={`stage-detail-duration-container-${props.stage.id}`}
-      >
-        <TimerIcon
-          className="detail-icon"
-          key={`stage-detail-duration-icon-${props.stage.id}`}
-        />
-        {props.stage.totalDurationMillis}
-      </div>
-      <div
-        className="detail-element"
-        key={`stage-detail-status-container-${props.stage.id}`}
-      >
-        <InfoIcon
-          className="detail-icon"
-          key={`stage-detail-status-icon-${props.stage.id}`}
-        />
-        <span
-          className="capitalize"
-          key={`stage-detail-status-text-${props.stage.id}`}
+      <div className={'pgv-details-card'}>
+        <div
+          className="pgv-details__item"
+          key={`stage-detail-start-time-container-${props.stage.id}`}
         >
-          {props.stage.state}
-        </span>
-      </div>
-      {props.failedSteps.map((value: StepInfo) => {
-        console.debug(`Found failed step ${value}`);
-        return (
-          <FailedStepLink
-            step={value}
-            key={`stage-detail-failed-step-link-${props.stage.id}-${value.id}`}
+          {props.stage.startTimeMillis && (
+            <ScheduleIcon
+              className="detail-icon"
+              key={`stage-detail-start-time-icon-${props.stage.id}`}
+            />
+          )}
+          {props.stage.startTimeMillis}
+        </div>
+        <div
+          className="pgv-details__item"
+          key={`stage-detail-pause-duration-container-${props.stage.id}`}
+        >
+          <HourglassEmptyIcon
+            className="detail-icon"
+            key={`stage-detail-pause-duration-icon-${props.stage.id}`}
           />
-        );
-      })}
-      <div className="detail-element">
-        <LinkIcon className="detail-icon" />
-        <a className="detail-element" href={`log?nodeId=${props.stage.id}`}>
-          View as plain text
-        </a>
+          {props.stage.pauseDurationMillis}
+        </div>
+        <div
+          className="pgv-details__item"
+          key={`stage-detail-duration-container-${props.stage.id}`}
+        >
+          <TimerIcon
+            className="detail-icon"
+            key={`stage-detail-duration-icon-${props.stage.id}`}
+          />
+          {props.stage.totalDurationMillis}
+        </div>
+        <div
+          className="pgv-details__item"
+          key={`stage-detail-status-container-${props.stage.id}`}
+        >
+          <InfoIcon
+            className="detail-icon"
+            key={`stage-detail-status-icon-${props.stage.id}`}
+          />
+          <span
+            className="capitalize"
+            key={`stage-detail-status-text-${props.stage.id}`}
+          >
+            {props.stage.state}
+          </span>
+        </div>
+        {props.failedSteps.map((value: StepInfo) => {
+          console.debug(`Found failed step ${value}`);
+          return (
+            <FailedStepLink
+              step={value}
+              key={`stage-detail-failed-step-link-${props.stage.id}-${value.id}`}
+            />
+          );
+        })}
+        <div className="pgv-details__item">
+          <LinkIcon className="detail-icon" />
+          <a className="pgv-details__item" href={`log?nodeId=${props.stage.id}`}>
+            View as plain text
+          </a>
+        </div>
       </div>
     </div>
   </React.Fragment>
@@ -105,9 +103,9 @@ export interface FailedStepLinkProps {
 }
 
 const FailedStepLink = (props: FailedStepLinkProps) => (
-  <div className="detail-element">
+  <div className="pgv-details__item">
     <LinkIcon className="detail-icon" />
-    <a className="detail-element" href={`?selected-node=${props.step.id}`}>
+    <a className="pgv-details__item" href={`?selected-node=${props.step.id}`}>
       Failed step: {props.step.name}
     </a>
   </div>
@@ -143,12 +141,9 @@ export default class StageView extends React.Component {
         }
       }
       return (
-        <pre
-          className="console-output"
-          id={`console-root-${this.props.stage ? this.props.stage.id : "unk"}`}
-        >
+        <div className={"jenkins-card"} id={`console-root-${this.props.stage ? this.props.stage.id : "unk"}`}>
           <StageSummary stage={this.props.stage} failedSteps={failedSteps} />
-        </pre>
+        </div>
       );
     }
     return null;
