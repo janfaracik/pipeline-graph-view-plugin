@@ -24,33 +24,12 @@
       background: var(--secondary);
       border: none;
       height: 2px;
-      margin: 0.4rem 0 calc(0.4rem + 15px);
+      margin: 0;
       opacity: 0.2;
     }
 
     &--wide {
       grid-column: span 2;
-    }
-  }
-
-  &__item__title-float {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 20px 20px 0 20px;
-    z-index: 1;
-
-    &::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      bottom: -20px;
-      backdrop-filter: blur(20px);
-      z-index: -1;
-      border-radius: 15px 15px 0 0;
-      mask-image: linear-gradient(white 25%, transparent);
-      pointer-events: none;
     }
   }
 }
@@ -68,21 +47,32 @@
   height: 100%;
   max-height: unset;
   background-color: rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   z-index: 1000;
 
   opacity: 1;
   visibility: visible;
   transform: scale(1);
-  transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
+  transition:
+    visibility 0s linear 0s,
+    opacity 0.25s 0s,
+    transform 0.25s;
+
+  // Reset styles inherit from .jenkins-card
+  border-radius: 0;
+
+  &::after {
+    display: none;
+  }
 }
 .pgv-modal__open > .pgv-modal__content {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: var(--card-background);
-  padding: 1rem 1.5rem;
+  background-color: var(--background);
+  box-shadow: var(--dialog-box-shadow);
   width: 95%;
   height: 90%;
   border-radius: 0.5rem;

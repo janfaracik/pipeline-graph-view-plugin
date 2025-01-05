@@ -39,6 +39,7 @@ interface PipelineConsoleState {
   hasScrolled: boolean;
   isComplete: boolean;
   hasUnmounted: boolean;
+  isStageViewExpanded: boolean;
 }
 
 // Determines the default selected step.
@@ -78,7 +79,7 @@ export const getDefaultSelectedStep = (steps: StepInfo[]) => {
 export const updateStepBuffer = (
   stepId: string,
   startByte: number,
-  stepBuffer: StepLogBufferInfo
+  stepBuffer: StepLogBufferInfo,
 ): StepLogBufferInfo => {
   getConsoleTextOffset(stepId, startByte).then((response) => {
     if (!response) {
@@ -92,7 +93,7 @@ export const updateStepBuffer = (
         console.warn(
           `Log update requested, but there will be a gap of '${
             startByte - stepBuffer.endByte
-          }'B in logs.`
+          }'B in logs.`,
         );
       }
       if (newLogLines.length > 0) {
@@ -135,6 +136,7 @@ export default class PipelineConsole extends React.Component<
       hasScrolled: false,
       isComplete: false,
       hasUnmounted: false,
+      isStageViewExpanded: true,
     };
   }
 
@@ -166,7 +168,7 @@ export default class PipelineConsole extends React.Component<
       },
       () => {
         this.followPipeline();
-      }
+      },
     );
   }
 
@@ -191,7 +193,7 @@ export default class PipelineConsole extends React.Component<
             // Setup poller to update stages.
             this.pollForUpdates();
           }
-        }
+        },
       );
     });
   }
@@ -270,7 +272,7 @@ export default class PipelineConsole extends React.Component<
     // If we were told what node was selected find and then expand it (and it's parents).
     if (selectedStage) {
       let startByte = parseInt(
-        params.get("start-byte") || `${0 - LOG_FETCH_SIZE}`
+        params.get("start-byte") || `${0 - LOG_FETCH_SIZE}`,
       );
       let expandedSteps = [] as string[];
       let expandedStages = [] as string[];
@@ -282,16 +284,16 @@ export default class PipelineConsole extends React.Component<
         expandedSteps = [step.id];
         expandedStages = this.getStageNodeHierarchy(
           step.stageId,
-          this.state.stages
+          this.state.stages,
         );
         this.updateStepConsoleOffset(step.id, false, startByte);
       } else {
         console.debug(
-          `Didn't find step with id '${selectedStage}', must be a stage.`
+          `Didn't find step with id '${selectedStage}', must be a stage.`,
         );
         expandedStages = this.getStageNodeHierarchy(
           selectedStage,
-          this.state.stages
+          this.state.stages,
         );
       }
       this.setState({
@@ -325,7 +327,7 @@ export default class PipelineConsole extends React.Component<
       expandedSteps = [step.id];
       expandedStages = this.getStageNodeHierarchy(
         step.stageId,
-        this.state.stages
+        this.state.stages,
       );
       this.setState({
         openStage: openStage,
@@ -396,7 +398,7 @@ export default class PipelineConsole extends React.Component<
   updateStepConsoleOffset(
     stepId: string,
     forceUpdate: boolean,
-    startByte: number
+    startByte: number,
   ) {
     let stepBuffer =
       this.state.stepBuffers.get(stepId) ??
@@ -408,7 +410,7 @@ export default class PipelineConsole extends React.Component<
       } as StepLogBufferInfo);
     if (stepBuffer.startByte > 0 && !forceUpdate) {
       console.debug(
-        `Skipping update of console text for step ${stepId} - already set.`
+        `Skipping update of console text for step ${stepId} - already set.`,
       );
       return;
     }
@@ -478,7 +480,7 @@ export default class PipelineConsole extends React.Component<
     if (this.state.openStage) {
       let openStage = this.getStageFromList(
         this.state.stages,
-        this.state.openStage
+        this.state.openStage,
       );
       if (openStage) {
         return openStage;
@@ -503,12 +505,21 @@ export default class PipelineConsole extends React.Component<
     return null;
   }
 
+  handlePaneCollapse = (sizes: Array<number | null>) => {
+    const isStageViewExpanded = sizes[0] === null;
+
+    if (this.state.isStageViewExpanded !== isStageViewExpanded) {
+      this.setState({ isStageViewExpanded });
+    }
+  };
+
   render() {
     const buttonPositionOffset = 10;
     const collapseDirection = "left";
     const collapseTransition = 500;
-    const grabberSize = 10;
+    const grabberSize = 50;
     const buttonTransition = "grow";
+    const stageViewPaneClass = `split-pane ${this.state.isStageViewExpanded ? "" : "collapsed"}`;
 
     return (
       <React.Fragment>
@@ -518,13 +529,16 @@ export default class PipelineConsole extends React.Component<
             initialSizes={[2, 8]}
             // minSize in Pixels (for all panes)
             minSizes={250}
-            className="split-pane"
+            className={stageViewPaneClass}
             split="vertical"
             collapse={{
               collapseTransitionTimeout: collapseTransition,
               buttonTransition,
               collapseDirection,
               buttonPositionOffset,
+            }}
+            hooks={{
+              onCollapse: this.handlePaneCollapse,
             }}
             resizerOptions={{
               grabberSize,
@@ -543,7 +557,7 @@ export default class PipelineConsole extends React.Component<
             </div>
 
             <div
-              className="split-pane split-pane--stage-view"
+              className={stageViewPaneClass}
               key="stage-view"
               id="stage-view-pane"
             >

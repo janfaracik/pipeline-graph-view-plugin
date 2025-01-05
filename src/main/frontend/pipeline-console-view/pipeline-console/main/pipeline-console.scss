@@ -12,7 +12,8 @@
 
 .app-page-body--one-column {
   max-width: 100vw;
-  margin: var(--section-padding)
+  margin: var(--section-padding);
+  margin-bottom: 0px;
 }
 
 [data-theme="dark"] {
@@ -27,7 +28,6 @@
 @media (prefers-color-scheme: dark) {
   [data-theme="dark-system"],
   [data-theme="dark-system"] {
-    --step-text-color: hsl(230deg 14% 23%);
     --step-bg-running: color-mix(in srgb, var(--accent-color) 50%, black);
     --step-bg-success: color-mix(in srgb, var(--success-color) 50%, black);
     --step-bg-unstable: color-mix(in srgb, var(--warning-color) 50%, black);
@@ -384,10 +384,17 @@ svg.detail-icon {
 
 div.split-pane {
   position: relative;
-  padding-left: 8px;
   text-align: left;
   height: calc(100vh - 300px);
   overflow: auto;
+
+  > div[style*="position: relative;"] {
+    width: 24px;
+  }
+
+  &.collapsed {
+    overflow: hidden;
+  }
 }
 
 a {

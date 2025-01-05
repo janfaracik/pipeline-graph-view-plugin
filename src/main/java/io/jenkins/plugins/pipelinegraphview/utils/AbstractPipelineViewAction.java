@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hudson.model.Action;
 import hudson.model.BallColor;
+import hudson.model.ParametersDefinitionProperty;
 import hudson.security.Permission;
 import hudson.util.HttpResponses;
 import java.util.concurrent.ExecutionException;
@@ -14,7 +15,7 @@ import net.sf.json.JSONObject;
 import org.jenkins.ui.icon.IconSpec;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.kohsuke.stapler.HttpResponse;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 import org.kohsuke.stapler.WebMethod;
 
 public abstract class AbstractPipelineViewAction implements Action, IconSpec {
@@ -43,6 +44,11 @@ public abstract class AbstractPipelineViewAction implements Action, IconSpec {
 
     public String getBuildDisplayName() {
         return run.getDisplayName();
+    }
+
+    public boolean isParameterized() {
+        ParametersDefinitionProperty property = run.getParent().getProperty(ParametersDefinitionProperty.class);
+        return property != null && !property.getParameterDefinitions().isEmpty();
     }
 
     public String getFullBuildDisplayName() {
@@ -89,7 +95,7 @@ public abstract class AbstractPipelineViewAction implements Action, IconSpec {
     }
 
     @WebMethod(name = "replay")
-    public HttpResponse replayRun(StaplerRequest req) {
+    public HttpResponse replayRun(StaplerRequest2 req) {
 
         JSONObject result = new JSONObject();
 
