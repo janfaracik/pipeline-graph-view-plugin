@@ -209,6 +209,7 @@ public class PipelineConsoleViewAction extends AbstractPipelineViewAction {
             text = PipelineNodeUtil.convertLogToString(logText, startByte, true);
             endByte = textLength;
         }
+        HashMap<String, Object> response = new HashMap<>();
         // If has an exception, return the exception text (inc. stacktrace).
         if (isUnhandledException(nodeId)) {
             // Set logText to exception text. This is a little hacky - maybe it would be better update the
@@ -218,8 +219,8 @@ public class PipelineConsoleViewAction extends AbstractPipelineViewAction {
                 text += nodeExceptionText;
             }
             endByte += text.length();
+            response.put("exception", true);
         }
-        HashMap<String, Object> response = new HashMap<>();
         response.put("text", text);
         response.put("startByte", startByte);
         response.put("endByte", endByte);

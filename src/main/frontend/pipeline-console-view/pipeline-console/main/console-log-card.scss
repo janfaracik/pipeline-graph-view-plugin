@@ -166,4 +166,9 @@ div.console-output-line {
       opacity: 1;
     }
   }
+
+  &--exception {
+    --text-color-secondary: var(--error-color);
+    color: var(--error-color)
+  }
 }

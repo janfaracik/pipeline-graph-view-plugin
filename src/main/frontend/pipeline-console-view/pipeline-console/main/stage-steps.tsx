@@ -32,6 +32,7 @@ export default function StageSteps({
                 lines: [] as string[],
                 startByte: 0 - LOG_FETCH_SIZE,
                 endByte: -1,
+                exception: false,
               } as StepLogBufferInfo)
             }
             handleStepToggle={handleStepToggle}

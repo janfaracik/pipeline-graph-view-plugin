@@ -29,6 +29,7 @@ export interface StepLogBufferInfo {
   lines: string[];
   startByte: number;
   endByte: number;
+  exception?: boolean;
 }
 
 // Returned from API, gets converted to 'StepLogBufferInfo'.
@@ -36,6 +37,7 @@ export interface ConsoleLogData {
   text: string;
   startByte: number;
   endByte: number;
+  exception?: boolean;
 }
 
 export async function getRunStatusFromPath(

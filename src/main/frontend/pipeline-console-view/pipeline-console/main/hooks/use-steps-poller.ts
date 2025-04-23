@@ -33,6 +33,7 @@ export function useStepsPoller(props: RunPollerProps) {
         lines: [],
         startByte: 0 - LOG_FETCH_SIZE,
         endByte: -1,
+        exception: false,
         stepId,
       };
       if (stepBuffer.startByte > 0 && !forceUpdate) return;
@@ -49,6 +50,7 @@ export function useStepsPoller(props: RunPollerProps) {
       }
 
       stepBuffer.endByte = response.endByte;
+      stepBuffer.exception = response.exception;
 
       setStepBuffers((prev) => new Map(prev).set(stepId, stepBuffer));
     },

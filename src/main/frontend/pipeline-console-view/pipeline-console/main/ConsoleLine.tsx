@@ -8,6 +8,7 @@ export interface ConsoleLineProps {
   stepId: string;
   startByte: number;
   heightCallback: (height: number) => void;
+  exception?: boolean;
 }
 
 declare global {
@@ -41,7 +42,7 @@ export const ConsoleLine = (props: ConsoleLineProps) => {
         key={`${props.lineNumber}-anchor`}
       />
       <div
-        className="console-output-line"
+        className={"console-output-line " + (props.exception ? "console-output-line--exception" : "")}
         key={`${props.lineNumber}-body`}
         ref={ref}
       >

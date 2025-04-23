@@ -83,6 +83,7 @@ export default function ConsoleLogStream(props: ConsoleLogStreamProps) {
           stepId={props.step.id}
           startByte={props.logBuffer.startByte}
           heightCallback={consoleLineHeightCallback}
+          exception={props.logBuffer.exception}
         />
       )}
     />
