@@ -1,4 +1,5 @@
 const path = require('path');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 const wrapWithDefaultModule = (config) => {
   return {
@@ -37,6 +38,11 @@ module.exports = [
       path: path.resolve(__dirname, 'src/main/webapp/js/bundles'),
       filename: 'pipeline-console-view-bundle.js',
     },
+    plugins: [
+      ...(process.env.ANALYZE ? [new BundleAnalyzerPlugin({analyzerPort: 8080,
+        // pick another port if 8888 is busy
+      })] : []),
+    ],
   }),
   wrapWithDefaultModule({
     entry: './src/main/frontend/pipeline-graph-view',
