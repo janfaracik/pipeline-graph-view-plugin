@@ -41,9 +41,36 @@
       opacity: 0.5;
     }
 
+    .testestets {
+      position: relative;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
     svg {
-      width: 1.375rem;
-      height: 1.375rem;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    .jenkins-avatar {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      bottom: -2px;
+      right: -2px;
+      width: 0.75rem;
+      height: 0.75rem;
+      background: color-mix(in oklch, var(--text-color-secondary) 10%, var(--background));
+      border-radius: 50%;
+      box-shadow: 0 0 0 1.5px white;
+      border: 1px solid color-mix(in oklch, var(--text-color-secondary) 20%, var(--background));
+
+      svg {
+        width: 0.5rem;
+        height: 0.5rem;
+        color:var(--text-color-secondary);
+      }
     }
   }
 }
