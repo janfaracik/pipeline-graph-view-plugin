@@ -65,14 +65,23 @@ export default function SingleRun({ run, currentJobPath }: SingleRunProps) {
           <span>
             {time(run.timestamp)} - <Total ms={run.duration} />
             <Changes />
+            {run.description}
           </span>
         </a>
       </div>
-      <PipelineGraph
-        stages={runInfo?.stages || []}
-        layout={getLayout()}
-        collapsed
-      />
+      {/*<PipelineGraph*/}
+      {/*  stages={runInfo?.stages || []}*/}
+      {/*  layout={getLayout()}*/}
+      {/*  collapsed*/}
+      {/*/>*/}
+      <div>
+        3 tests passed
+        5 tests failed
+      </div>
+      <div>
+        no spotbugs
+        no linting issues
+      </div>
     </div>
   );
 }

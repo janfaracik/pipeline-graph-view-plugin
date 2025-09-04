@@ -11,7 +11,7 @@
               data-preference-show-stage-names="${it.showStageNames}"
               data-preference-show-stage-durations="${it.showStageDurations}"/>
 
-    <l:card title="${%Stages}" expandable="multi-pipeline-graph" controls="${controls}">
+    <l:card title="${%Builds}" controls="${controls}">
       <div id="multiple-pipeline-root"
            data-current-job-path="${rootURL + '/' + it.jobUrl}"
            data-user-locale="${request2.getLocale().toLanguageTag()}" />

@@ -49,6 +49,7 @@ export const MultiPipelineGraph = () => {
 
   return (
     <>
+      {/*<input type="search" placeholder="Search" className="jenkins-input" />*/}
       {Object.keys(groupedRuns).length === 0 ? (
         <div className="pgv-stages__group">
           <div className="pgv-stages__heading">

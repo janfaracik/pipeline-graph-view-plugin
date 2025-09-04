@@ -21,6 +21,7 @@ public class PipelineRun {
     private final long duration;
     private final int changesCount;
     private final boolean building;
+    private final String description;
 
     @NonNull
     final PipelineState result;
@@ -33,7 +34,8 @@ public class PipelineRun {
                 run.getDuration(),
                 getChanges(run).size(),
                 PipelineState.of(run),
-                run.isBuilding());
+                run.isBuilding(),
+                run.getDescription());
     }
 
     PipelineRun(
@@ -43,7 +45,8 @@ public class PipelineRun {
             long duration,
             int changesCount,
             @NonNull PipelineState result,
-            boolean building) {
+            boolean building,
+            String description) {
         this.id = id;
         this.displayName = displayName;
         this.timestamp = timestamp;
@@ -51,6 +54,7 @@ public class PipelineRun {
         this.changesCount = changesCount;
         this.result = result;
         this.building = building;
+        this.description = description;
     }
 
     public boolean isBuilding() {
@@ -89,6 +93,7 @@ public class PipelineRun {
             json.element("timestamp", run.timestamp);
             json.element("duration", run.duration);
             json.element("changesCount", run.changesCount);
+            json.element("description", run.description);
             json.element("result", run.result, jsonConfig);
             return json;
         }
