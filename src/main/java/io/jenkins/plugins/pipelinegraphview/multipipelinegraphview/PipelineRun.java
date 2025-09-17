@@ -3,13 +3,19 @@ package io.jenkins.plugins.pipelinegraphview.multipipelinegraphview;
 import static io.jenkins.plugins.pipelinegraphview.utils.ChangesUtil.getChanges;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import io.jenkins.plugins.pipelinegraphview.cards.items.TodoTest;
 import io.jenkins.plugins.pipelinegraphview.utils.PipelineState;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
 import net.sf.json.processors.JsonBeanProcessor;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
+import java.util.Optional;
+
 public class PipelineRun {
+
+    @NonNull
+    private final WorkflowRun run;
 
     @NonNull
     private final String id;
@@ -28,6 +34,7 @@ public class PipelineRun {
 
     public PipelineRun(WorkflowRun run) {
         this(
+            run,
                 run.getId(),
                 run.getDisplayName(),
                 run.getTimeInMillis(),
@@ -39,6 +46,7 @@ public class PipelineRun {
     }
 
     PipelineRun(
+        WorkflowRun run,
             @NonNull String id,
             @NonNull String displayName,
             long timestamp,
@@ -47,6 +55,7 @@ public class PipelineRun {
             @NonNull PipelineState result,
             boolean building,
             String description) {
+        this.run = run;
         this.id = id;
         this.displayName = displayName;
         this.timestamp = timestamp;
@@ -94,6 +103,9 @@ public class PipelineRun {
             json.element("duration", run.duration);
             json.element("changesCount", run.changesCount);
             json.element("description", run.description);
+
+            TodoTest.get(run.run).ifPresent(e -> json.element("tests", e));
+
             json.element("result", run.result, jsonConfig);
             return json;
         }

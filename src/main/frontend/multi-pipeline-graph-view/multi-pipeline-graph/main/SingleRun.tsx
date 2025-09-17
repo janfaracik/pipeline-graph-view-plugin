@@ -1,8 +1,13 @@
 import "./single-run.scss";
 
-import { useContext } from "react";
+import { Fragment, useContext } from "react";
 
 import StatusIcon from "../../../common/components/status-icon.tsx";
+import {
+  FAILING,
+  PASSING,
+  SKIPPED,
+} from "../../../common/components/symbols.tsx";
 import {
   I18NContext,
   LocalizedMessageKey,
@@ -28,6 +33,7 @@ export default function SingleRun({ run, currentJobPath }: SingleRunProps) {
     if (run.changesCount === 0) {
       return;
     }
+
     return (
       <>
         {" - "}
@@ -57,32 +63,52 @@ export default function SingleRun({ run, currentJobPath }: SingleRunProps) {
   }
 
   return (
-    <div className={`pgv-single-run ${getCompactLayout()}`}>
-      <div>
+    <>
+      <div className={`pgv-single-run ${getCompactLayout()}`}>
         <a href={currentJobPath + run.id} className="pgv-user-specified-text">
           <StatusIcon status={run.result} />
           {run.displayName}
-          <span>
-            {time(run.timestamp)} - <Total ms={run.duration} />
-            <Changes />
-            {run.description}
-          </span>
         </a>
+        <div>
+          <PipelineGraph
+            stages={runInfo?.stages || []}
+            layout={getLayout()}
+            collapsed
+          />
+        </div>
+        {run.tests && (
+          <a href={currentJobPath + run.id + '/' + run.tests?.url} className="pgv-single-run__tests">
+          <span className={'jenkins-!-success-color'}>
+            {PASSING}
+            {run.tests?.passingCount}
+          </span>
+            <span className={'jenkins-!-skipped-color'}>
+            {SKIPPED}
+              {run.tests?.skippedCount}
+          </span>
+            <span className={'jenkins-!-error-color'}>
+            {FAILING}
+              {run.tests?.failingCount}
+          </span>
+          </a>
+        )}
       </div>
-      {/*<PipelineGraph*/}
-      {/*  stages={runInfo?.stages || []}*/}
-      {/*  layout={getLayout()}*/}
-      {/*  collapsed*/}
-      {/*/>*/}
-      <div>
-        3 tests passed
-        5 tests failed
+      <div className={'idk'}>
+        {[
+          run.timestamp && time(run.timestamp),
+          run.duration != null && <Total ms={run.duration} />,
+          Changes(),
+          run.description
+        ]
+          .filter(Boolean) // removes null/undefined/false
+          .map((item, index, array) => (
+            <Fragment key={index}>
+              {item}
+              {index < array.length - 1 && <span className="dot">•</span>}
+            </Fragment>
+          ))}
       </div>
-      <div>
-        no spotbugs
-        no linting issues
-      </div>
-    </div>
+    </>
   );
 }
 

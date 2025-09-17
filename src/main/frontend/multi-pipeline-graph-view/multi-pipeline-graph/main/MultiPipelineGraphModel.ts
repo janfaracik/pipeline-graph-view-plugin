@@ -9,4 +9,11 @@ export interface RunInfo {
   changesCount: number;
   result: Result;
   description: string;
+  tests?: {
+    url: string;
+    passingCount: number;
+    failingCount: number;
+    skippedCount: number;
+    totalCount: number;
+  }
 }
