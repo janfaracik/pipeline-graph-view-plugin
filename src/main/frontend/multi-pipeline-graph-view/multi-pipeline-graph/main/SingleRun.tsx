@@ -64,17 +64,24 @@ export default function SingleRun({ run, currentJobPath }: SingleRunProps) {
 
   return (
     <>
-      <div className={`pgv-single-run ${getCompactLayout()}`}>
+      <div className={`pgv-single-run`}>
         <a href={currentJobPath + run.id} className="pgv-user-specified-text">
           <StatusIcon status={run.result} />
           {run.displayName}
         </a>
-        <div>
-          <PipelineGraph
-            stages={runInfo?.stages || []}
-            layout={getLayout()}
-            collapsed
-          />
+        <div className={'dontleavemehere'}>
+          {(runInfo?.stages || []).map((stage) => (
+            <>
+              <StatusIcon status={stage.state} key={stage.id} />
+              <div className='melodramatic' />
+              {(stage.children).map((stage) => (
+                <div key={stage.id} className={'dontleavemehere'} style={{ opacity: 0.5 }}>
+                  <StatusIcon status={stage.state} />
+                  <div className='melodramatic' />
+                </div>
+              ))}
+            </>
+          ))}
         </div>
         {run.tests && (
           <a href={currentJobPath + run.id + '/' + run.tests?.url} className="pgv-single-run__tests">
@@ -95,6 +102,7 @@ export default function SingleRun({ run, currentJobPath }: SingleRunProps) {
       </div>
       <div className={'idk'}>
         {[
+          'Started by Jan',
           run.timestamp && time(run.timestamp),
           run.duration != null && <Total ms={run.duration} />,
           Changes(),

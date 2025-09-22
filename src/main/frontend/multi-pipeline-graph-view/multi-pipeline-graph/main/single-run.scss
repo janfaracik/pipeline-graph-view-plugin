@@ -1,3 +1,23 @@
+.dontleavemehere {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.175rem;
+  z-index: 0;
+
+  .melodramatic {
+    background: var(--jenkins-border-color);
+    width: 0.5rem;
+    height: 1.5px;
+    border-radius: 100px;
+  }
+
+  & > svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
 .idk {
   position: relative;
   display: flex;
@@ -33,11 +53,10 @@
 
 .pgv-single-run {
   display: grid;
-  grid-template-columns: 200px 1fr auto;
+  grid-template-columns: 300px 1fr auto;
   align-items: start;
 
   & > * {
-    //box-shadow: inset 0 0 5px 5px red;
     height: 30px;
   }
 

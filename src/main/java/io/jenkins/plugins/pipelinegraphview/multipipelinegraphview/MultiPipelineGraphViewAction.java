@@ -47,7 +47,6 @@ public class MultiPipelineGraphViewAction implements Action, IconSpec {
         return Item.CONFIGURE;
     }
 
-    @SuppressWarnings("unused")
     public boolean isShowGraphOnJobPage() {
         return PipelineGraphViewConfiguration.get().isShowGraphOnJobPage();
     }
@@ -123,6 +122,10 @@ public class MultiPipelineGraphViewAction implements Action, IconSpec {
 
     @Override
     public String getIconClassName() {
+        if (isShowGraphOnJobPage()) {
+            return null;
+        }
+
         return "symbol-layers-outline plugin-ionicons-api";
     }
 }
