@@ -44,24 +44,6 @@ export default function SingleRun({ run, currentJobPath }: SingleRunProps) {
     );
   }
 
-  const { showNames, showDurations } = useUserPreferences();
-
-  function getLayout() {
-    const layout: LayoutInfo = { ...defaultLayout };
-
-    if (!showNames && !showDurations) {
-      layout.nodeSpacingH = 45;
-    } else {
-      layout.nodeSpacingH = 90;
-    }
-
-    return layout;
-  }
-
-  function getCompactLayout() {
-    return !showNames && !showDurations ? "pgv-single-run--compact" : "";
-  }
-
   return (
     <>
       <div className={`pgv-single-run`}>
@@ -73,13 +55,34 @@ export default function SingleRun({ run, currentJobPath }: SingleRunProps) {
           {(runInfo?.stages || []).map((stage) => (
             <>
               <StatusIcon status={stage.state} key={stage.id} />
-              <div className='melodramatic' />
-              {(stage.children).map((stage) => (
-                <div key={stage.id} className={'dontleavemehere'} style={{ opacity: 0.5 }}>
-                  <StatusIcon status={stage.state} />
-                  <div className='melodramatic' />
-                </div>
-              ))}
+
+              {stage.children.length > 0 && (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200" width="500" height="200">
+                  <path d="M20 60
+           H200
+           C250 60 300 100 300 140
+           C300 180 250 220 200 220
+           H100
+           C60 220 40 180 40 140
+           C40 100 60 60 100 60
+           H480"
+                        fill="none"
+                        stroke="black"
+                        strokeWidth="8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"/>
+                </svg>
+              )}
+              {stage.children.length === 0 && (
+                <div className='melodramatic' />
+              )}
+
+              {/*{(stage.children).map((stage) => (*/}
+              {/*  <div key={stage.id} className={'dontleavemehere'}>*/}
+              {/*    <StatusIcon status={stage.state} />*/}
+              {/*    <div className='melodramatic' />*/}
+              {/*  </div>*/}
+              {/*))}*/}
             </>
           ))}
         </div>
