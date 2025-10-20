@@ -25,78 +25,82 @@ export default function Stages({
 
   return (
     <div
-      className={classNames("pgv-stages-graph", {
+      className={classNames("jenkins-card",
+        "pgv-stages-graph",
+        {
         "pgv-stages-graph--left": stageViewPosition === StageViewPosition.LEFT,
         "pgv-stages-graph--dialog": isExpanded,
       })}
     >
-      {!onRunPage && (
-        <div className={"pgv-stages-graph__controls pgv-stages-graph__heading"}>
-          Graph
-        </div>
-      )}
-      {onRunPage && (
-        <a
-          className={"pgv-stages-graph__controls pgv-stages-graph__heading"}
-          href="pipeline-overview"
-        >
-          Stages
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-            <path
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="48"
-              d="M184 112l144 144-144 144"
-            />
-          </svg>
-        </a>
-      )}
-      <div className={"pgv-stages-graph__controls pgw-fullscreen-controls"}>
-        <Tooltip content={isExpanded ? "Close" : "Expand"}>
-          <button
-            className={"jenkins-button jenkins-button--tertiary"}
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded && (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                <path
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="32"
-                  d="M368 368L144 144M368 144L144 368"
-                />
-              </svg>
-            )}
-            {!isExpanded && (
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
+      <div className={'jenkins-card__title'}>
+        {!onRunPage && (
+          <span className={'jenkins-!-text-color-secondary pgv-stages-graph__title-text'}>
+            Graph
+          </span>
+        )}
+        {onRunPage && (
+          <span className={'pgv-stages-graph__title-text'}>
+            <a
+              className={"jenkins-card__title-link jenkins-card__reveal"}
+              href="pipeline-overview"
+            >
+            Stages
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+              <path
                 fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M10 4H15C15.5523 4 16 4.44772 16 5V10M10 16H5C4.44772 16 4 15.5523 4 15V10"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-            )}
-          </button>
-        </Tooltip>
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="48"
+                d="M184 112l144 144-144 144"
+              />
+            </svg>
+          </a>
+          </span>
+        )}
+        <div className={"jenkins-card__controls"}>
+          <Tooltip content={isExpanded ? "Close" : "Expand"}>
+            <button
+              className={"jenkins-card__reveal"}
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded && (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                  <path
+                    fill="none"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="32"
+                    d="M368 368L144 144M368 144L144 368"
+                  />
+                </svg>
+              )}
+              {!isExpanded && (
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M10 4H15C15.5523 4 16 4.44772 16 5V10M10 16H5C4.44772 16 4 15.5523 4 15V10"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              )}
+            </button>
+          </Tooltip>
+        </div>
       </div>
       <TransformWrapper
         minScale={0.75}
         maxScale={3}
         wheel={{ activationKeys: isExpanded ? [] : ["Control"] }}
       >
-        <ZoomControls />
-
         <TransformComponent wrapperStyle={{ width: "100%", height: "100%" }}>
           <PipelineGraph
             stages={stages}
@@ -109,6 +113,8 @@ export default function Stages({
             })}
           />
         </TransformComponent>
+
+        <ZoomControls />
       </TransformWrapper>
     </div>
   );
@@ -143,10 +149,10 @@ function ZoomControls() {
   });
 
   return (
-    <div className="pgv-stages-graph__controls pgw-zoom-controls">
+    <div className="pgw-zoom-controls">
       <Tooltip content={"Zoom in"}>
         <button
-          className={"jenkins-button jenkins-button--tertiary"}
+          className={"jenkins-card__reveal"}
           onClick={() => zoomIn()}
           disabled={buttonState.zoomIn}
         >
@@ -164,7 +170,7 @@ function ZoomControls() {
       </Tooltip>
       <Tooltip content={"Zoom out"}>
         <button
-          className={"jenkins-button jenkins-button--tertiary"}
+          className={"jenkins-card__reveal"}
           onClick={() => zoomOut()}
           disabled={buttonState.zoomOut}
         >
@@ -182,7 +188,7 @@ function ZoomControls() {
       </Tooltip>
       <Tooltip content={"Reset"}>
         <button
-          className={"jenkins-button jenkins-button--tertiary"}
+          className={"jenkins-card__reveal"}
           onClick={() => resetTransform()}
           disabled={buttonState.reset}
         >

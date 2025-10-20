@@ -1,10 +1,43 @@
 .pgv-stages-graph {
-  position: relative;
-  background: var(--card-background);
-  border: var(--card-border-width) solid var(--card-border-color);
-  border-radius: var(--form-input-border-radius);
+  height: 100% !important;
   overflow: hidden;
-  height: 100%;
+
+  .pgv-stages-graph__title-text, .jenkins-card__controls, .pgw-zoom-controls {
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: -0.1875rem;
+      backdrop-filter: blur(10px);
+      border-radius: calc(var(--form-input-border-radius) - -0.1875rem);
+      background: color-mix(in srgb, var(--card-background) 80%, transparent);
+      border: var(--jenkins-border-width) solid transparent;
+      background-clip: padding-box;
+      z-index: -1;
+    }
+
+    .jenkins-card__reveal {
+      --item-background: none;
+      --item-blur: none;
+      margin-block: unset;
+    }
+  }
+
+  .pgw-zoom-controls {
+    position: absolute;
+    inset: 0.5625rem;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+  }
+
+  .jenkins-card__title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
 
   &--left {
     position: sticky;
@@ -30,42 +63,9 @@
     height: unset;
     max-height: unset;
 
-    .pgv-stages-graph__controls {
-      margin: 1rem;
-      color: var(--text-color);
-    }
-
     .jenkins-button svg {
       width: 1.125rem;
       height: 1.125rem;
-    }
-  }
-
-  &__heading {
-    padding: 0 0.55rem;
-    bottom: unset !important;
-    right: unset !important;
-    line-height: 2rem;
-    font-weight: var(--font-bold-weight);
-    font-size: var(--font-size-sm);
-    gap: 0.375rem;
-    color: var(--text-color-secondary);
-    text-decoration: none !important;
-
-    &[href] {
-      color: var(--text-color) !important;
-    }
-
-    svg {
-      width: 0.875rem;
-      height: 0.875rem;
-      color: var(--text-color-secondary);
-      transition: color var(--standard-transition);
-      margin-right: -0.25rem;
-    }
-
-    &:hover svg {
-      color: var(--text-color);
     }
   }
 }
@@ -78,18 +78,4 @@
   .pgv-split-view__container {
     z-index: 1001;
   }
-}
-
-.pgv-stages-graph__controls {
-  position: absolute;
-  inset: 0.1875rem;
-  display: flex;
-  z-index: 1;
-  backdrop-filter: blur(10px);
-  border-radius: 0.45rem;
-  align-items: center;
-  color: var(--text-color-secondary);
-  background: color-mix(in srgb, var(--card-background) 80%, transparent);
-  border: var(--jenkins-border-width) solid transparent;
-  background-clip: padding-box;
 }
