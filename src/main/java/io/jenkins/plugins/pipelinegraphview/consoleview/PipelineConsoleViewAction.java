@@ -127,7 +127,7 @@ public class PipelineConsoleViewAction extends Tab {
         }
     }
 
-    @WebMethod(name = "log")
+    @WebMethod(name = "log.txt")
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @SuppressFBWarnings(
             value = "RV_RETURN_VALUE_IGNORED",

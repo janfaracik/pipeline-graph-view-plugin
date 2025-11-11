@@ -119,7 +119,7 @@ export default function StageDetails({ stage }: StageDetailsProps) {
               {
                 text: "View stage as plain text",
                 icon: DOCUMENT,
-                href: `log?nodeId=${stage.id}`,
+                href: `log.txt?nodeId=${stage.id}`,
                 target: "_blank",
               },
               {
@@ -144,7 +144,7 @@ export default function StageDetails({ stage }: StageDetailsProps) {
                     />
                   </svg>
                 ),
-                href: `log?nodeId=${stage.id}`,
+                href: `log.txt?nodeId=${stage.id}`,
                 download: `${stage.name}.txt`,
               },
             ]}
