@@ -4,7 +4,6 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Plugin;
 import hudson.console.AnnotatedLargeText;
-import hudson.model.Action;
 import hudson.model.BallColor;
 import hudson.model.Item;
 import hudson.model.ParametersDefinitionProperty;
@@ -14,15 +13,10 @@ import hudson.security.Permission;
 import hudson.util.HttpResponses;
 import io.jenkins.plugins.pipelinegraphview.Messages;
 import io.jenkins.plugins.pipelinegraphview.PipelineGraphViewConfiguration;
-import io.jenkins.plugins.pipelinegraphview.cards.RunDetailsCard;
 import io.jenkins.plugins.pipelinegraphview.cards.RunDetailsItem;
 import io.jenkins.plugins.pipelinegraphview.cards.items.ArtifactRunDetailsItem;
 import io.jenkins.plugins.pipelinegraphview.cards.items.ChangesRunDetailsItem;
-import io.jenkins.plugins.pipelinegraphview.cards.items.SCMRunDetailsItems;
 import io.jenkins.plugins.pipelinegraphview.cards.items.TestResultRunDetailsItem;
-import io.jenkins.plugins.pipelinegraphview.cards.items.TimingRunDetailsItems;
-import io.jenkins.plugins.pipelinegraphview.cards.items.UpstreamCauseRunDetailsItem;
-import io.jenkins.plugins.pipelinegraphview.cards.items.UserIdCauseRunDetailsItem;
 import io.jenkins.plugins.pipelinegraphview.utils.PipelineGraph;
 import io.jenkins.plugins.pipelinegraphview.utils.PipelineGraphApi;
 import io.jenkins.plugins.pipelinegraphview.utils.PipelineNodeUtil;
@@ -35,9 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import jenkins.model.Jenkins;
+import jenkins.model.Tab;
 import net.sf.json.JSONObject;
 import net.sf.json.JsonConfig;
-import org.jenkins.ui.icon.IconSpec;
 import org.jenkinsci.plugins.pipeline.modeldefinition.actions.RestartDeclarativePipelineAction;
 import org.jenkinsci.plugins.workflow.cps.replay.ReplayAction;
 import org.jenkinsci.plugins.workflow.flow.FlowExecution;
@@ -53,8 +47,7 @@ import org.kohsuke.stapler.verb.GET;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PipelineConsoleViewAction implements Action, IconSpec {
-    public static final long LOG_THRESHOLD = 150 * 1024; // 150KB
+public class PipelineConsoleViewAction extends Tab {
     public static final String URL_NAME = "pipeline-overview";
     public static final int CACHE_AGE = (int) TimeUnit.DAYS.toSeconds(1);
 
@@ -71,6 +64,7 @@ public class PipelineConsoleViewAction implements Action, IconSpec {
     private final PipelineStepApi stepApi;
 
     public PipelineConsoleViewAction(WorkflowRun target) {
+        super(target);
         this.run = target;
         this.graphApi = new PipelineGraphApi(this.run);
         this.stepApi = new PipelineStepApi(this.run);
@@ -78,7 +72,7 @@ public class PipelineConsoleViewAction implements Action, IconSpec {
 
     @Override
     public String getDisplayName() {
-        return "Pipeline Overview";
+        return "Stages";
     }
 
     @Override
@@ -194,93 +188,6 @@ public class PipelineConsoleViewAction implements Action, IconSpec {
         return HttpResponses.text(getNodeExceptionText(nodeId));
     }
 
-    /*
-     * The default behavior of this functions differs from 'getConsoleOutput' in that it will use LOG_THRESHOLD from the end of the string.
-     * Note: if 'startByte' is negative and falls outside of the console text then we will start from byte 0.
-     *
-     * FIXME: This is not performant and needs to be re-written to not buffer in memory. Avoiding JSON for log text.
-     *
-     * Example:
-     * {
-     *   "startByte": 0,
-     *   "endByte": 13,
-     *   "text": "Hello, world!"
-     * }
-     */
-    @GET
-    @WebMethod(name = "consoleOutput")
-    public HttpResponse getConsoleOutput(StaplerRequest2 req) throws IOException {
-        run.checkPermission(Item.READ);
-        String nodeId = req.getParameter("nodeId");
-        if (nodeId == null) {
-            logger.error("'consoleJson' was not passed 'nodeId'.");
-            return HttpResponses.errorJSON("Error getting console json");
-        }
-        logger.debug("getConsoleOutput was passed node id '{}'.", nodeId);
-        // This will be a step, so return it's log output.
-        // startByte to start getting data from. If negative will startByte from end of string with
-        // LOG_THRESHOLD.
-        Long startByte = parseIntWithDefault(req.getParameter("startByte"), -LOG_THRESHOLD);
-        JSONObject data = getConsoleOutputJson(nodeId, startByte);
-        if (data == null) {
-            return HttpResponses.errorJSON("Something went wrong - check Jenkins logs.");
-        }
-        return HttpResponses.okJSON(data);
-    }
-
-    protected JSONObject getConsoleOutputJson(String nodeId, Long requestStartByte) throws IOException {
-        long startByte = 0L;
-        long endByte = 0L;
-        long textLength;
-        String text = "";
-        AnnotatedLargeText<? extends FlowNode> logText = null;
-        boolean nodeIsActive = false;
-        {
-            FlowExecution execution = run.getExecution();
-            if (execution != null) {
-                logger.debug("getConsoleOutputJson found execution.");
-                FlowNode node = execution.getNode(nodeId);
-                if (node != null) {
-                    // Look up active state before getting the logText.
-                    nodeIsActive = node.isActive();
-                    logText = PipelineNodeUtil.getLogText(node);
-                }
-            }
-        }
-
-        if (logText != null) {
-            textLength = logText.length();
-            // positive startByte
-            if (requestStartByte > textLength) {
-                // Avoid resource leak.
-                logger.error("consoleJson - user requested startByte larger than console output.");
-                return null;
-            }
-            // if startByte is negative make sure we don't try and get a byte before 0.
-            if (requestStartByte < 0L) {
-                logger.debug("consoleJson - requested negative startByte '{}'.", requestStartByte);
-                startByte = textLength + requestStartByte;
-                if (startByte < 0L) {
-                    logger.debug(
-                            "consoleJson - requested negative startByte '{}' out of bounds, starting at 0.",
-                            requestStartByte);
-                    startByte = 0L;
-                }
-            } else {
-                startByte = requestStartByte;
-            }
-            logger.debug("Returning '{}' bytes from 'getConsoleOutput'.", textLength - startByte);
-            text = PipelineNodeUtil.convertLogToString(logText, startByte);
-            endByte = textLength;
-        }
-        JSONObject json = new JSONObject();
-        json.element("text", text);
-        json.element("startByte", startByte);
-        json.element("endByte", endByte);
-        json.element("nodeIsActive", nodeIsActive);
-        return json;
-    }
-
     private AnnotatedLargeText<? extends FlowNode> getLogForNode(String nodeId) throws IOException {
         FlowExecution execution = run.getExecution();
         if (execution != null) {
@@ -318,24 +225,12 @@ public class PipelineConsoleViewAction implements Action, IconSpec {
     }
 
     @SuppressWarnings("unused")
-    public RunDetailsCard getRunDetailsCard() {
-
-        List<RunDetailsItem> runDetailsItems = new ArrayList<>(SCMRunDetailsItems.get(run));
-
-        if (!runDetailsItems.isEmpty()) {
-            runDetailsItems.add(RunDetailsItem.SEPARATOR);
-        }
-
-        UpstreamCauseRunDetailsItem.get(run).ifPresent(runDetailsItems::add);
-        UserIdCauseRunDetailsItem.get(run).ifPresent(runDetailsItems::add);
-
-        runDetailsItems.addAll(TimingRunDetailsItems.get(run));
-
+    public List<RunDetailsItem> getRunDetailsItems() {
+        List<RunDetailsItem> runDetailsItems = new ArrayList<>();
         ChangesRunDetailsItem.get(run).ifPresent(runDetailsItems::add);
         TestResultRunDetailsItem.get(run).ifPresent(runDetailsItems::add);
         ArtifactRunDetailsItem.get(run).ifPresent(runDetailsItems::add);
-
-        return new RunDetailsCard(runDetailsItems);
+        return runDetailsItems;
     }
 
     public boolean isShowGraphOnBuildPage() {
@@ -517,12 +412,7 @@ public class PipelineConsoleViewAction implements Action, IconSpec {
     }
 
     @Override
-    public String getIconClassName() {
-        return "symbol-git-network-outline plugin-ionicons-api";
-    }
-
-    @Override
     public String getIconFileName() {
-        return null;
+        return "symbol-git-network-outline plugin-ionicons-api";
     }
 }

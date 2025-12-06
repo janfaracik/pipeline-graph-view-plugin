@@ -28,14 +28,19 @@ export default function PipelineConsole() {
 
   const { stageViewPosition, mainViewVisibility } = useLayoutPreferences();
   const {
+    complete,
+    tailLogs,
+    scrollToTail,
+    startTailingLogs,
+    stopTailingLogs,
     openStage,
     openStageSteps,
-    openStageStepBuffers,
+    stepBuffers,
     expandedSteps,
     stages,
     handleStageSelect,
     onStepToggle,
-    onMoreConsoleClick,
+    fetchLogText,
     fetchExceptionText,
     loading,
   } = useStepsPoller({ currentRunPath, previousRunPath });
@@ -52,6 +57,12 @@ export default function PipelineConsole() {
         container={document.getElementById("console-pipeline-overflow-root")}
       >
         <Dropdown
+          className={
+            rootElement?.closest(".app-build-content")
+              ? "jenkins-details__button"
+              : ""
+          }
+          icon={SETTINGS}
           items={[
             showSplitView ? (
               <StagesCustomization key="visibility-select" />
@@ -116,7 +127,7 @@ export default function PipelineConsole() {
                     </div>
                   ) : (
                     <DataTreeView
-                      onNodeSelect={(_, nodeId) => handleStageSelect(nodeId)}
+                      onNodeSelect={handleStageSelect}
                       selected={openStage?.id}
                       stages={stages}
                     />
@@ -132,12 +143,15 @@ export default function PipelineConsole() {
                 </div>
               ) : (
                 <StageView
+                  tailLogs={tailLogs}
+                  scrollToTail={scrollToTail}
+                  stopTailingLogs={stopTailingLogs}
                   stage={openStage}
                   steps={openStageSteps}
-                  stepBuffers={openStageStepBuffers}
+                  stepBuffers={stepBuffers}
                   expandedSteps={expandedSteps}
                   onStepToggle={onStepToggle}
-                  onMoreConsoleClick={onMoreConsoleClick}
+                  fetchLogText={fetchLogText}
                   fetchExceptionText={fetchExceptionText}
                 />
               )}
@@ -146,9 +160,17 @@ export default function PipelineConsole() {
         </SplitView>
       )}
 
-      {!loading && stages.length === 0 && <NoStageStepsFallback />}
+      {!loading && stages.length === 0 && (
+        <NoStageStepsFallback tailLogs={tailLogs} scrollToTail={scrollToTail} />
+      )}
 
-      <ScrollToTopBottom />
+      <ScrollToTopBottom
+        complete={complete}
+        loading={loading}
+        tailLogs={tailLogs}
+        startTailingLogs={startTailingLogs}
+        stopTailingLogs={stopTailingLogs}
+      />
     </>
   );
 }

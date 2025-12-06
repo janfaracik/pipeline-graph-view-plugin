@@ -9,12 +9,13 @@ import StageView from "./StageView.tsx";
 
 (globalThis as any).TextEncoder = TextEncoder;
 
+const mockBuffer = { lines: [], startByte: 0, endByte: 0 };
+
 const mockStage: StageInfo = {
   id: 1,
   name: "Build Stage",
   state: Result.success,
   skeleton: false,
-  completePercent: 100,
   children: [],
   type: "STAGE",
   title: "Build",
@@ -32,7 +33,6 @@ const mockSteps: StepInfo[] = [
     stageId: "stage-1",
     state: Result.running,
     name: "",
-    completePercent: 0,
     type: "",
     pauseDurationMillis: 0,
     startTimeMillis: 0,
@@ -45,13 +45,16 @@ describe("StageView", () => {
     await act(async () => {
       render(
         <StageView
+          tailLogs={false}
+          scrollToTail={() => {}}
+          stopTailingLogs={() => {}}
           stage={mockStage}
           steps={mockSteps}
           stepBuffers={new Map()}
           expandedSteps={["step-1"]}
           onStepToggle={vi.fn()}
-          onMoreConsoleClick={vi.fn()}
-          fetchExceptionText={vi.fn()}
+          fetchLogText={async () => mockBuffer}
+          fetchExceptionText={async () => mockBuffer}
         />,
       );
     });

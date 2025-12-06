@@ -7,6 +7,7 @@ import { ResourceBundle } from "./i18n/index.ts";
 export interface RunStatus {
   stages: StageInfo[];
   complete: boolean;
+  raw?: string;
 }
 
 export interface InputStep {
@@ -20,6 +21,7 @@ export interface InputStep {
 export interface AllStepsData {
   steps: StepInfo[];
   runIsComplete: boolean;
+  raw?: string;
 }
 
 /**
@@ -29,7 +31,6 @@ export interface StepInfo {
   name: string;
   title: string;
   state: Result;
-  completePercent: number;
   inputStep?: InputStep;
   id: string;
   type: string;
@@ -46,10 +47,11 @@ export interface StepLogBufferInfo {
   endByte: number;
   pending?: Promise<void>;
   consoleAnnotator?: string;
+  hasTrailingNewLine?: boolean;
   lastFetched?: number;
   stopTailing?: boolean;
   exceptionText?: string[];
-  pendingExceptionText?: Promise<string[]>;
+  pendingExceptionText?: Promise<void>;
 }
 
 // Returned from API, gets converted to 'StepLogBufferInfo'.
@@ -61,32 +63,24 @@ export interface ConsoleLogData {
   consoleAnnotator: string;
 }
 
-export async function getRunStatusFromPath(
-  url: string,
-): Promise<RunStatus | null> {
-  try {
-    const response = await fetch(url + "pipeline-overview/tree");
-    if (!response.ok) {
-      throw response.statusText;
-    }
-    const json = await response.json();
-    return json.data;
-  } catch (e) {
-    console.error(`Caught error getting tree: '${e}'`);
-    return null;
+export async function getRunStatusFromPath(url: string): Promise<RunStatus> {
+  const response = await fetch(url + "pipeline-overview/tree");
+  if (!response.ok) {
+    throw response.statusText;
   }
+  const text = await response.text();
+  const json = JSON.parse(text);
+  json.data.raw = text;
+  return json.data;
 }
 
-export async function getRunSteps(): Promise<AllStepsData | null> {
-  try {
-    const response = await fetch("allSteps");
-    if (!response.ok) throw response.statusText;
-    const json = await response.json();
-    return json.data;
-  } catch (e) {
-    console.warn(`Caught error getting steps: '${e}'`);
-    return null;
-  }
+export async function getRunSteps(): Promise<AllStepsData> {
+  const response = await fetch("allSteps");
+  if (!response.ok) throw response.statusText;
+  const text = await response.text();
+  const json = JSON.parse(text);
+  json.data.raw = text;
+  return json.data;
 }
 
 export async function getConsoleTextOffset(
@@ -94,18 +88,23 @@ export async function getConsoleTextOffset(
   startByte: number,
   consoleAnnotator: string,
 ): Promise<ConsoleLogData | null> {
-  const headers = new Headers();
+  const headers = new Headers({ Accept: "multipart/form-data" });
   if (consoleAnnotator) headers.set("X-ConsoleAnnotator", consoleAnnotator);
   try {
     const response = await fetch(
-      `consoleOutput?nodeId=${stepId}&startByte=${startByte}`,
+      `../execution/node/${stepId}/log/logText/progressiveHtml?start=${startByte.toString()}`,
       { headers },
     );
     if (!response.ok) throw response.statusText;
-    const json = await response.json();
+    const data = await response.formData();
+    const text = data.get("text") as string;
+    const meta = JSON.parse(data.get("meta") as string);
     return {
-      ...json.data,
-      consoleAnnotator: response.headers.get("X-ConsoleAnnotator") || "",
+      text,
+      startByte: meta.start,
+      endByte: meta.end,
+      nodeIsActive: !meta.completed,
+      consoleAnnotator: meta.consoleAnnotator,
     };
   } catch (e) {
     console.error(`Caught error when fetching console: '${e}'`);
