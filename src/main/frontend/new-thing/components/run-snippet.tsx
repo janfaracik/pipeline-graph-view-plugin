@@ -5,6 +5,7 @@ import Tooltip from "../../common/components/tooltip.tsx";
 import { RunStatus } from "../../common/RestClient.tsx";
 import { Result } from "../../pipeline-graph-view/pipeline-graph/main/PipelineGraphModel.tsx";
 import { collapseTopLevelStages } from "./utils.ts";
+import LiveTotal from "../../common/utils/live-total.tsx";
 
 export default function RunSnippet({
   run,
@@ -35,32 +36,9 @@ export default function RunSnippet({
         const e = item.stage;
 
         return (
-          <Tooltip content={e.name} key={e.id} delay={[200, 0]}>
-            <a href={currentRunPath + e.id} className="status-with-arc">
-              <div className={"status-icon"}>
-                <StatusIcon status={e.state} />
-              </div>
-
-              <svg
-                className="status-label-svg"
-                viewBox="0 0 64 64"
-                aria-hidden="true"
-              >
-                <path
-                  id="status-arc"
-                  d="M 18 64 A 14 14 0 0 0 46 64"
-                  fill="none"
-                />
-                <text className="status-arc-label">
-                  <textPath
-                    href="#status-arc"
-                    startOffset="50%"
-                    textAnchor="middle"
-                  >
-                    {e.state}
-                  </textPath>
-                </text>
-              </svg>
+          <Tooltip content={<div style={{ textAlign: "center" }}><div>{e.name}</div><div className={'jenkins-!-text-color-secondary'}><LiveTotal total={e.totalDurationMillis} start={e.startTimeMillis} /></div></div>} key={e.id}>
+            <a href={currentRunPath + e.id}>
+              <StatusIcon status={e.state} />
             </a>
           </Tooltip>
         );
