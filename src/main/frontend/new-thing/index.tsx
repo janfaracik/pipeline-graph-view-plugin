@@ -1,8 +1,8 @@
 import { createRoot, Root } from "react-dom/client";
 
-import SingleRun from "./components/SingleRun.tsx";
-import { UserPreferencesProvider } from "../common/user/user-preferences-provider.tsx";
 import { RunStatus } from "../common/RestClient.tsx";
+import { UserPreferencesProvider } from "../common/user/user-preferences-provider.tsx";
+import RunSnippet from "./components/run-snippet.tsx";
 
 const roots = new WeakMap<Element, Root>();
 const HOST_SELECTOR = '[data-type="pipeline-graph-host"]';
@@ -23,7 +23,7 @@ function mountGraphHost(element: Element): void {
 
   root.render(
     <UserPreferencesProvider>
-      <SingleRun run={json} currentRunPath={currentRunPath} />
+      <RunSnippet run={json} currentRunPath={currentRunPath} />
     </UserPreferencesProvider>,
   );
 }

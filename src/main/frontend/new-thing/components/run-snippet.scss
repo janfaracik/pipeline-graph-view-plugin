@@ -1,0 +1,51 @@
+.pgv-run-snippet {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 200px;
+  width: 200px;
+
+  & > a,
+  .pgv-run-snippet__collapsed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    //svg {
+    //  width: 1.625rem;
+    //  height: 1.625rem;
+    //  flex-shrink: 0;
+    //}
+  }
+}
+
+.status-with-arc {
+  position: relative;
+  width: 4rem;
+  height: 4rem;
+  display: inline-grid;
+  place-items: center;
+}
+
+.status-with-arc > svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  margin-top: 2rem;
+}
+
+.status-icon {
+  width: 1.625rem;
+  height: 1.625rem;
+  display: grid;
+  place-items: center;
+  z-index: 1;
+}
+
+.status-arc-label {
+  fill: currentColor;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
