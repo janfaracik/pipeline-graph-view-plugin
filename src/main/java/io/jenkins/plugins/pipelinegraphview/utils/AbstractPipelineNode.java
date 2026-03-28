@@ -55,4 +55,32 @@ public class AbstractPipelineNode {
             return json;
         }
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public PipelineState getState() {
+        return state;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public long getPauseDurationMillis() {
+        return pauseDurationMillis;
+    }
+
+    public TimingInfo getTimingInfo() {
+        return timingInfo;
+    }
 }

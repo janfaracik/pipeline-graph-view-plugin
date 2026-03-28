@@ -52,7 +52,7 @@ public class PipelineConsoleViewAction extends Tab {
     public static final int CACHE_AGE = (int) TimeUnit.DAYS.toSeconds(1);
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineConsoleViewAction.class);
-    private static final JsonConfig jsonConfig = new JsonConfig();
+    public static final JsonConfig jsonConfig = new JsonConfig();
 
     static {
         PipelineStepList.PipelineStepListJsonProcessor.configure(jsonConfig);

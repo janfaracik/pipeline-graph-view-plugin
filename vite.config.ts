@@ -19,6 +19,8 @@ export default defineConfig({
           "src/main/frontend/pipeline-console-view/index.tsx",
         "pipeline-graph-view":
           "src/main/frontend/pipeline-graph-view/index.tsx",
+        "new-thing":
+          "src/main/frontend/new-thing/index.tsx",
         "multi-pipeline-graph-view":
           "src/main/frontend/multi-pipeline-graph-view/index.tsx",
       },
