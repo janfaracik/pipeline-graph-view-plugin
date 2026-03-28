@@ -5,8 +5,7 @@
     <template data-row-id="pipeline-graph-view">
         ${it.decorator.json}
     </template>
-    <div data-type="pipeline-graph-host">
+    <div data-type="pipeline-graph-host" data-current-run-path="${rootURL + '/' + build.url + 'stages?selected-node='}">
         hello
     </div>
-
 </j:jelly>

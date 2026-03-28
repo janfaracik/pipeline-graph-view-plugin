@@ -2,23 +2,22 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:f="/lib/form" xmlns:dd="/lib/layout/dropdowns">
   <j:if test="${it.showGraphOnJobPage}">
-    <j:set var="controls">
-        <div id="pgv-settings"/>
-    </j:set>
-    <!-- workaround floatingBox elements overlapping until page is reworked -->
-    <div class="clearfix" />
-    <template data-module="user-preferences"
-              data-preference-show-stage-names="${it.showStageNames}"
-              data-preference-show-stage-durations="${it.showStageDurations}"/>
+<!--    <j:set var="controls">-->
+<!--        <div id="pgv-settings"/>-->
+<!--    </j:set>-->
+<!--    &lt;!&ndash; workaround floatingBox elements overlapping until page is reworked &ndash;&gt;-->
+<!--    <div class="clearfix" />-->
+<!--    <template data-module="user-preferences"-->
+<!--              data-preference-show-stage-names="${it.showStageNames}"-->
+<!--              data-preference-show-stage-durations="${it.showStageDurations}"/>-->
 
-    <l:card title="${%Stages}" expandable="multi-pipeline-graph" controls="${controls}">
-      <div id="multiple-pipeline-root"
-           data-current-job-path="${rootURL + '/' + it.jobUrl}"
-           data-user-locale="${request2.getLocale().toLanguageTag()}" />
-    </l:card>
-    <script src="${rootURL}/plugin/pipeline-graph-view/js/bundles/multi-pipeline-graph-view-bundle.js" type="module"/>
-    <script src="${rootURL}/plugin/pipeline-graph-view/js/build.js" type="module"/>
-
+<!--    <l:card title="${%Stages}" expandable="multi-pipeline-graph" controls="${controls}">-->
+<!--      <div id="multiple-pipeline-root"-->
+<!--           data-current-job-path="${rootURL + '/' + it.jobUrl}"-->
+<!--           data-user-locale="${request2.getLocale().toLanguageTag()}" />-->
+<!--    </l:card>-->
+<!--    <script src="${rootURL}/plugin/pipeline-graph-view/js/bundles/multi-pipeline-graph-view-bundle.js" type="module"/>-->
+<!--    <script src="${rootURL}/plugin/pipeline-graph-view/js/build.js" type="module"/>-->
     <script src="${rootURL}/plugin/pipeline-graph-view/js/bundles/new-thing-bundle.js" type="module"/>
   </j:if>
 

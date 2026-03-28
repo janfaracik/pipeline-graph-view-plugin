@@ -1,10 +1,62 @@
-import { createRoot } from "react-dom/client";
+import { createRoot, Root } from "react-dom/client";
 
-const rootElement = document.querySelectorAll(
-  '[data-type="pipeline-graph-host"]'
-);
+import SingleRun from "./components/SingleRun.tsx";
+import { UserPreferencesProvider } from "../common/user/user-preferences-provider.tsx";
+import { RunStatus } from "../common/RestClient.tsx";
 
-rootElement.forEach((element) => {
+const roots = new WeakMap<Element, Root>();
+const HOST_SELECTOR = '[data-type="pipeline-graph-host"]';
+
+function mountGraphHost(element: Element): void {
+  if (roots.has(element)) {
+    return;
+  }
+
   const root = createRoot(element);
-  root.render(<h1>Hello</h1>);
-})
+  roots.set(element, root);
+
+  const currentRunPath = (element as HTMLTemplateElement).dataset.currentRunPath!;
+  const previousElement = element.previousElementSibling as HTMLTemplateElement;
+  const json = JSON.parse(
+    previousElement.content.textContent as string,
+  ) as RunStatus;
+
+  root.render(
+    <UserPreferencesProvider>
+      <SingleRun run={json} currentRunPath={currentRunPath} />
+    </UserPreferencesProvider>,
+  );
+}
+
+function scanForHosts(node: ParentNode | Element = document): void {
+  if (node instanceof Element && node.matches(HOST_SELECTOR)) {
+    mountGraphHost(node);
+  }
+
+  if ("querySelectorAll" in node) {
+    node.querySelectorAll(HOST_SELECTOR).forEach((element) => {
+      mountGraphHost(element);
+    });
+  }
+}
+
+scanForHosts();
+
+const observer = new MutationObserver((mutations: MutationRecord[]) => {
+  for (const mutation of mutations) {
+    mutation.addedNodes.forEach((node: Node) => {
+      if (!(node instanceof Element)) {
+        return;
+      }
+
+      scanForHosts(node);
+    });
+  }
+});
+
+if (document.body) {
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
+}
