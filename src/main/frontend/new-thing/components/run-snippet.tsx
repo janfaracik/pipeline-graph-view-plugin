@@ -3,9 +3,8 @@ import "./run-snippet.scss";
 import StatusIcon from "../../common/components/status-icon.tsx";
 import Tooltip from "../../common/components/tooltip.tsx";
 import { RunStatus } from "../../common/RestClient.tsx";
-import { Result } from "../../pipeline-graph-view/pipeline-graph/main/PipelineGraphModel.tsx";
-import { collapseTopLevelStages } from "./utils.ts";
 import LiveTotal from "../../common/utils/live-total.tsx";
+import { collapseTopLevelStages } from "./utils.ts";
 
 export default function RunSnippet({
   run,
@@ -22,12 +21,11 @@ export default function RunSnippet({
         if (item.kind === "collapsed") {
           return (
             <Tooltip
-              content={`${item.hiddenCount} hidden stage${item.hiddenCount === 1 ? "" : "s"}`}
               key={item.id}
-              delay={[200, 0]}
+              content={`${item.hiddenCount} hidden stage${item.hiddenCount === 1 ? "" : "s"}`}
             >
               <div className="pgv-run-snippet__collapsed">
-                <StatusIcon status={Result.not_built} />
+                {item.hiddenCount}
               </div>
             </Tooltip>
           );

@@ -67,4 +67,36 @@ public class PipelineStage extends AbstractPipelineNode {
             return json;
         }
     }
+
+    public List<PipelineStage> getChildren() {
+        return children;
+    }
+
+    public String getSeqContainerName() {
+        return seqContainerName;
+    }
+
+    public PipelineStage getNextSibling() {
+        return nextSibling;
+    }
+
+    public boolean isSequential() {
+        return sequential;
+    }
+
+    public boolean isSynthetic() {
+        return synthetic;
+    }
+
+    public boolean isPlaceholder() {
+        return placeholder;
+    }
+
+    public String getAgent() {
+        return agent;
+    }
+
+    public String getUrl() {
+        return url;
+    }
 }

@@ -1,20 +1,46 @@
 .pgv-run-snippet {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   margin-right: 200px;
   width: 200px;
+  gap: 0.25rem;
 
-  & > a,
+  & > *{
+    transition: var(--standard-transition);
+  }
+
   .pgv-run-snippet__collapsed {
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50px;
+    border: var(--jenkins-border);
+    text-wrap: nowrap;
+    color: var(--text-color-secondary);
+    font-size: 10px;
+    min-height: 20px;
+    padding: 0 0.375rem;
+  }
+
+  & > a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      translate: 0 -2px;
+    }
 
     svg {
       width: 1.625rem;
       height: 1.625rem;
       flex-shrink: 0;
+    }
+  }
+
+  &:hover {
+    & > *:not(:hover) {
+      opacity: 0.65;
     }
   }
 }

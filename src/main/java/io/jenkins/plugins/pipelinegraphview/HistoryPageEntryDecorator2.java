@@ -29,18 +29,26 @@ import hudson.model.Item;
 import hudson.widgets.HistoryWidget;
 import io.jenkins.plugins.pipelinegraphview.utils.PipelineGraph;
 import io.jenkins.plugins.pipelinegraphview.utils.PipelineGraphApi;
+import io.jenkins.plugins.pipelinegraphview.utils.PipelineStage;
+import java.util.Collections;
 import jenkins.model.HistoricalBuild;
 import jenkins.widgets.HistoryPageEntryDecorator;
 import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+import net.sf.json.processors.JsonBeanProcessor;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jspecify.annotations.NonNull;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-import static io.jenkins.plugins.pipelinegraphview.consoleview.PipelineConsoleViewAction.jsonConfig;
-
 @Extension
 public class HistoryPageEntryDecorator2 extends HistoryPageEntryDecorator {
+    private static final JsonConfig historyPageJsonConfig = new JsonConfig();
+
+    static {
+        PipelineGraph.PipelineGraphJsonProcessor.configure(historyPageJsonConfig);
+        historyPageJsonConfig.registerJsonBeanProcessor(PipelineStage.class, new HistoryPagePipelineStageJsonProcessor());
+    }
 
     private String json;
 
@@ -51,14 +59,38 @@ public class HistoryPageEntryDecorator2 extends HistoryPageEntryDecorator {
         }
 
         run.checkPermission(Item.READ);
+
+        // TODO - Do this without returning children
         PipelineGraph tree = new PipelineGraphApi(run).createTree();
-        json = JSONObject.fromObject(tree, jsonConfig).toString(2);
+        json = toHistoryPageJson(tree).toString(2);
 
         return true;
+    }
+
+    static JSONObject toHistoryPageJson(PipelineGraph tree) {
+        return JSONObject.fromObject(tree, historyPageJsonConfig);
     }
 
     @Restricted(NoExternalUse.class)
     public String getJson() {
         return json;
+    }
+
+    private static final class HistoryPagePipelineStageJsonProcessor implements JsonBeanProcessor {
+        @Override
+        public JSONObject processBean(Object bean, JsonConfig config) {
+            if (!(bean instanceof PipelineStage stage)) {
+                return null;
+            }
+
+            JSONObject json = new JSONObject();
+            json.element("id", stage.getId());
+            json.element("name", stage.getName());
+            json.element("state", stage.getState(), config);
+            json.element("startTimeMillis", stage.getStartTimeMillis());
+            json.element("totalDurationMillis", stage.getTotalDurationMillis());
+            json.element("url", stage.getUrl());
+            return json;
+        }
     }
 }
