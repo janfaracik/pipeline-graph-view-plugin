@@ -30,7 +30,6 @@ import hudson.widgets.HistoryWidget;
 import io.jenkins.plugins.pipelinegraphview.utils.PipelineGraph;
 import io.jenkins.plugins.pipelinegraphview.utils.PipelineGraphApi;
 import io.jenkins.plugins.pipelinegraphview.utils.PipelineStage;
-import java.util.Collections;
 import jenkins.model.HistoricalBuild;
 import jenkins.widgets.HistoryPageEntryDecorator;
 import net.sf.json.JSONObject;
@@ -41,13 +40,14 @@ import org.jspecify.annotations.NonNull;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 
-@Extension
+@Extension(ordinal = Integer.MAX_VALUE)
 public class HistoryPageEntryDecorator2 extends HistoryPageEntryDecorator {
     private static final JsonConfig historyPageJsonConfig = new JsonConfig();
 
     static {
         PipelineGraph.PipelineGraphJsonProcessor.configure(historyPageJsonConfig);
-        historyPageJsonConfig.registerJsonBeanProcessor(PipelineStage.class, new HistoryPagePipelineStageJsonProcessor());
+        historyPageJsonConfig.registerJsonBeanProcessor(
+                PipelineStage.class, new HistoryPagePipelineStageJsonProcessor());
     }
 
     private String json;

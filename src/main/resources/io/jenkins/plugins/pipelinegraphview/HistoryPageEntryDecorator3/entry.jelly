@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-variant-numeric: tabular-nums;">
+        <j:if test="${it.decorator.totalCount > 0}">
+            <span style="color: #1f883d; font-weight: 600;">
+                ${it.decorator.passCount} passed
+            </span>
+
+            <j:if test="${it.decorator.failCount > 0}">
+                <span style="color: #d1242f; font-weight: 600;">
+                    ${it.decorator.failCount} failed
+                </span>
+            </j:if>
+
+            <j:if test="${it.decorator.skipCount > 0}">
+                <span style="color: #9a6700; font-weight: 600;">
+                    ${it.decorator.skipCount} skipped
+                </span>
+            </j:if>
+
+            <span style="color: var(--text-color-secondary, #656d76);">
+                ${it.decorator.totalCount} total
+            </span>
+        </j:if>
+    </div>
+</j:jelly>
