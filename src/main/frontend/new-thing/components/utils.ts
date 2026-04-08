@@ -1,6 +1,6 @@
 import { StageInfo } from "../../pipeline-graph-view/pipeline-graph/main/PipelineGraphModel.tsx";
 
-export type VisibleRunItem =
+type VisibleRunItem =
   | {
       kind: "stage";
       stage: StageInfo;
@@ -14,13 +14,6 @@ export type VisibleRunItem =
 const FAILURE_STATES = new Set(["FAILED", "FAILURE", "ERROR", "ABORTED"]);
 
 const WARNING_STATES = new Set(["UNSTABLE", "WARNING", "WARN"]);
-
-// Keep these values aligned with run-snippet.scss so the width budget matches
-// the actual rendered snippet.
-const RUN_SNIPPET_STAGE_WIDTH = 26;
-const RUN_SNIPPET_ITEM_GAP = 4;
-const RUN_SNIPPET_COLLAPSED_WIDTH = 32;
-const MIN_COLLAPSED_VISIBLE_ITEMS = 3;
 
 function isFailureState(state: string): boolean {
   return FAILURE_STATES.has(state.toUpperCase());
@@ -39,107 +32,108 @@ function getSpecialStageIndex(stages: StageInfo[]): number {
   return stages.findIndex((stage) => isWarningState(stage.state));
 }
 
-function toStageItems(stages: StageInfo[]): VisibleRunItem[] {
-  return stages.map((stage) => ({
-    kind: "stage",
-    stage,
-  }));
-}
-
-function createCollapsedItems(
-  stages: StageInfo[],
-  headVisibleCount: number,
-  tailVisibleCount: number,
-): VisibleRunItem[] {
-  return [
-    ...toStageItems(stages.slice(0, headVisibleCount)),
-    {
-      kind: "collapsed",
-      id: `collapsed-${headVisibleCount}-${stages.length - tailVisibleCount - 1}`,
-      hiddenCount: stages.length - headVisibleCount - tailVisibleCount,
-    },
-    ...toStageItems(stages.slice(stages.length - tailVisibleCount)),
-  ];
-}
-
-export function getVisibleRunItemLimit(
-  stageCount: number,
-  availableWidth: number,
-): number {
-  if (
-    stageCount <= MIN_COLLAPSED_VISIBLE_ITEMS ||
-    !Number.isFinite(availableWidth) ||
-    availableWidth <= 0
-  ) {
-    return stageCount;
-  }
-
-  const fullWidth =
-    stageCount * RUN_SNIPPET_STAGE_WIDTH +
-    Math.max(0, stageCount - 1) * RUN_SNIPPET_ITEM_GAP;
-
-  if (fullWidth <= availableWidth) {
-    return stageCount;
-  }
-
-  const collapsedItemLimit =
-    Math.floor(
-      (availableWidth - RUN_SNIPPET_COLLAPSED_WIDTH) /
-        (RUN_SNIPPET_STAGE_WIDTH + RUN_SNIPPET_ITEM_GAP),
-    ) + 1;
-
-  return Math.max(
-    MIN_COLLAPSED_VISIBLE_ITEMS,
-    Math.min(stageCount - 1, collapsedItemLimit),
-  );
+function uniqueSortedIndices(indices: number[], max: number): number[] {
+  return [...new Set(indices)]
+    .filter((i) => i >= 0 && i < max)
+    .sort((a, b) => a - b);
 }
 
 export function collapseTopLevelStages(
   stages: StageInfo[],
-  maxVisibleItems = 10,
+  maxVisibleStages = 10,
 ): VisibleRunItem[] {
-  if (stages.length <= maxVisibleItems) {
-    return toStageItems(stages);
-  }
-
-  const clampedMaxVisibleItems = Math.max(
-    MIN_COLLAPSED_VISIBLE_ITEMS,
-    maxVisibleItems,
-  );
-  const visibleStageCount = clampedMaxVisibleItems - 1;
-  let headVisibleCount = Math.ceil(visibleStageCount / 2);
-  let tailVisibleCount = visibleStageCount - headVisibleCount;
-
-  if (tailVisibleCount < 1) {
-    tailVisibleCount = 1;
-    headVisibleCount = visibleStageCount - tailVisibleCount;
+  if (stages.length <= maxVisibleStages) {
+    return stages.map((stage) => ({
+      kind: "stage",
+      stage,
+    }));
   }
 
   const specialIndex = getSpecialStageIndex(stages);
-  const specialAlreadyVisible =
-    specialIndex !== -1 &&
-    (specialIndex < headVisibleCount ||
-      specialIndex >= stages.length - tailVisibleCount);
 
-  if (!specialAlreadyVisible && specialIndex !== -1) {
-    const stagesNeededFromHead = specialIndex + 1;
-    const stagesNeededFromTail = stages.length - specialIndex;
-    const canShiftToHead = stagesNeededFromHead <= visibleStageCount - 1;
-    const canShiftToTail = stagesNeededFromTail <= visibleStageCount - 1;
-    const distanceFromHead = specialIndex;
-    const distanceFromTail = stages.length - 1 - specialIndex;
+  // Leave room for one collapsed marker.
+  const targetStageCount = Math.max(1, maxVisibleStages - 1);
 
-    if (
-      canShiftToHead &&
-      (!canShiftToTail || distanceFromHead <= distanceFromTail)
+  // Start with a balanced default window.
+  const headCount = Math.ceil(targetStageCount / 2);
+  const tailCount = Math.floor(targetStageCount / 2);
+
+  const keep = new Set<number>();
+
+  const addHead = (count: number) => {
+    for (let i = 0; i < Math.min(count, stages.length); i += 1) {
+      keep.add(i);
+    }
+  };
+
+  const addTail = (count: number) => {
+    for (
+      let i = Math.max(0, stages.length - count);
+      i < stages.length;
+      i += 1
     ) {
-      headVisibleCount = stagesNeededFromHead;
-      tailVisibleCount = visibleStageCount - headVisibleCount;
-    } else if (canShiftToTail) {
-      tailVisibleCount = stagesNeededFromTail;
-      headVisibleCount = visibleStageCount - tailVisibleCount;
+      keep.add(i);
+    }
+  };
+
+  addHead(headCount);
+  addTail(tailCount);
+
+  if (specialIndex !== -1) {
+    keep.add(specialIndex);
+
+    // If adding the special stage pushed us over budget, bias toward keeping
+    // the special stage plus the earliest and latest context.
+    while (keep.size > targetStageCount) {
+      const sorted = [...keep].sort((a, b) => a - b);
+
+      // Prefer removing non-special items closest to the middle.
+      const removable = sorted.filter((i) => i !== specialIndex);
+      if (removable.length === 0) {
+        break;
+      }
+
+      let candidate = removable[0];
+      let bestScore = -1;
+
+      for (const index of removable) {
+        const distanceFromEdge = Math.min(index, stages.length - 1 - index);
+        const distanceFromSpecial = Math.abs(index - specialIndex);
+
+        // Higher score = more removable.
+        const score =
+          distanceFromEdge * 10 + (distanceFromSpecial < 2 ? -100 : 0);
+
+        if (score > bestScore) {
+          bestScore = score;
+          candidate = index;
+        }
+      }
+
+      keep.delete(candidate);
     }
   }
 
-  return createCollapsedItems(stages, headVisibleCount, tailVisibleCount);
+  const keptIndices = uniqueSortedIndices([...keep], stages.length);
+  const result: VisibleRunItem[] = [];
+
+  for (let i = 0; i < keptIndices.length; i += 1) {
+    const currentIndex = keptIndices[i];
+    const previousIndex = i > 0 ? keptIndices[i - 1] : -1;
+
+    if (previousIndex !== -1 && currentIndex - previousIndex > 1) {
+      result.push({
+        kind: "collapsed",
+        id: `collapsed-${previousIndex + 1}-${currentIndex - 1}`,
+        hiddenCount: currentIndex - previousIndex - 1,
+      });
+    }
+
+    result.push({
+      kind: "stage",
+      stage: stages[currentIndex],
+    });
+  }
+
+  return result;
 }
