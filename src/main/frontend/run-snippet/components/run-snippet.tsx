@@ -48,6 +48,10 @@ export default function RunSnippet({
   const total = stages.length;
   const started = stages.filter((stage) => !stage.skeleton).length;
   const current = currentStage(stages);
+  // Once nothing's running, point out what failed in place of the running stage
+  const failed = stages.filter(
+    (stage) => !stage.skeleton && stage.state === Result.failure,
+  );
 
   return (
     <div>
@@ -171,6 +175,14 @@ export default function RunSnippet({
                 total={current.totalDurationMillis}
                 start={current.startTimeMillis}
               />
+            </span>
+          </>
+        )}
+        {!current && failed.length > 0 && (
+          <>
+            <span aria-hidden="true">·</span>
+            <span className="pgv-run-snippet__summary__name">
+              {failed.length === 1 ? failed[0].name : `${failed.length} failed`}
             </span>
           </>
         )}

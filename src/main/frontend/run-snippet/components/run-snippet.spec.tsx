@@ -452,8 +452,27 @@ describe("RunSnippet current stage", () => {
     expect(
       summaryOf([
         stage({ id: 1, name: "Checkout" }),
-        stage({ id: 2, name: "Build", state: Result.failure }),
+        stage({ id: 2, name: "Build" }),
       ]),
     ).toEqual(["2 stages"]);
+  });
+
+  it("names the failed stage once the run has finished", () => {
+    expect(
+      summaryOf([
+        stage({ id: 1, name: "Checkout" }),
+        stage({ id: 2, name: "Build", state: Result.failure }),
+      ]),
+    ).toEqual(["2 stages", "·", "Build"]);
+  });
+
+  it("counts the failed stages when more than one failed", () => {
+    expect(
+      summaryOf([
+        stage({ id: 1, name: "Checkout", state: Result.failure }),
+        stage({ id: 2, name: "Build" }),
+        stage({ id: 3, name: "Test", state: Result.failure }),
+      ]),
+    ).toEqual(["3 stages", "·", "2 failed"]);
   });
 });
